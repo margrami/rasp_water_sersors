@@ -1,0 +1,25 @@
+
+<div id="random_decimal">
+      {{ x }}
+    <table class="table">
+      <thead>
+        <th>Pot.1</th>
+        <th>Pot.2</th>
+        <th>Sensor 1</th>
+        <th>Sensor 2</th>
+        <th>Sensor 3</th>
+        <th>Sensor 4</th>
+      </thead>
+      <tbody>
+      {% for i in table_data %}
+         {% if loop.index0 is divisibleby(6) %}
+            <tr>
+             {% endif %}
+                <td>{{i}}</td>
+             {% if loop.index is divisibleby(6) %}
+            </tr>
+            {% endif %}
+            {% endfor %}
+    </tbody>
+</table>
+ </div>
