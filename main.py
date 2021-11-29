@@ -1,4 +1,5 @@
 from flask import Flask, render_template, jsonify, Response
+from flask_sqlalchemy import SQLAlchemy
 import numpy as np
 import sys
 import datetime
@@ -10,6 +11,33 @@ from time import sleep
 from MCP3008 import MCP3008
 
 app = Flask(__name__)
+
+#database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+
+class Sensor(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    time = db.Column(db.DateTime, nullable=False) 
+    plantName = db.Column(db.String(32), nullable=False )
+    value = db.Column(db.Float, nullable=False)
+    watering = db.Column(db.Boolean)
+    wateringML = db.Column(db.Integer)
+
+    def to_dict(self):
+        return {
+             'id': self.id,
+             'time': self.time,
+             'value': self.value
+        }
+    
+
+db.create_all()
+
+#/database
+
 adc = MCP3008()
 channels = [0, 1, 2, 3, 4, 5]
 sleepTime = 1
@@ -24,12 +52,15 @@ def print_interator(it):
         print(x, end = '       ')
     print('')
 
+def print_dico(dic):
+    for k, v in dic.items():
+        print(k, v)
+
 
 @app.route('/')
 def index():
     number = np.random.rand()
     table_data = map(lambda x: val(x), channels)
-
     return render_template('home.html', x = number, table_data = table_data )
 
 
@@ -37,9 +68,12 @@ def index():
 def updatedecimal():
     random_decimal = np.random.rand()
     table_data = map(lambda x: val(x), channels)
-    
     return jsonify('', render_template('random_decimal_model.html', x = random_decimal, table_data = table_data))
 
+
+@app.route('/watering')
+def watering():
+    return render_template ('home.html', w = 'registrado') 
 
 
 @app.route ('/plot.png')
@@ -53,7 +87,7 @@ def create_figure():
 	fig = Figure()
 	axis = fig.add_subplot(1, 1, 1)
 	xs = range(100)
-	ys = [random.randint(1, 50) for x in xs]
+	ys = [np.random.randint(1, 50) for x in xs]
 	axis.plot(xs, ys)
 	return fig
 

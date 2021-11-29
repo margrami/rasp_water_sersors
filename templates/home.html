@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Raspberry page</title>
+  <title>Raspberry Page</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"/>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   <script src='https://kit.fontawesome.com/8d4ed307b9.js' crossorigin='anonymous'></script>
@@ -40,8 +41,10 @@
 <div class="container-fluid text-center">    
   <div class="row content">
     <div class="col-sm-2 sidenav">
-      <p><a href="https://www.raspberrypi.com/software/">Software</a></p>
-      <p><a href="https://www.raspberrypi.com/documentation/">Documentación</a></p>
+      
+
+      <a href="{{ url_for('watering') }}" class="btn btn-info" role="button"><i class='fas fa-shower'></i></a>
+
     </div>
     <div class="col-sm-8 text-left"> 
       <h1>Instrucciones</h1>
@@ -70,6 +73,8 @@
       });
      }
     });
+
+    $().button('toggle')
     </script>
 
     <div id="random_decimal">

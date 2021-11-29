@@ -51,4 +51,25 @@ h1,h2,h3,h4,label.lead,.btn,.form-group,.navbar a, thead
 
 .navbar-inverse .navbar-nav>li>a {
     color: #1e1c1c;
+  }
+
+.btn-group-lg>.btn, .btn-lg {
+    padding: 15px 20px;
+    font-size: 35px;
+    line-height: 1.3333333;
+    border-radius: 10px;
+}
+
+.btn-info {
+    color: #fff;
+    background-color: #e3c40b;
+    border-color: #555;
+    padding: 15px 20px;
+    font-size: 40px;
+}
+
+.btn-info:hover {
+    color: #fff;
+    background-color: #b32f07;
+    border-color: #ede4e0;
 }
