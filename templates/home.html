@@ -58,10 +58,10 @@
      
      $(function(){
       window.setInterval(function(){
-        loadNewDecimal()
+        loadNewLecture()
       }, 2000)
 
-     function loadNewDecimal(){
+     function loadNewLecture(){
       $.ajax({
           url:"/update_decimal",
           type:"POST",
@@ -78,7 +78,7 @@
     </script>
 
     <div id="random_decimal">
-      {{ x }}
+      {{ lecture }}
     <table class="table">
       <thead>
         <th>Pot.1</th>
