@@ -40,15 +40,16 @@
   
 <div class="container-fluid text-center">    
   <div class="row content">
+    
     <div class="col-sm-2 sidenav">
-      
-
-      <a href="{{ url_for('watering') }}" class="btn btn-info" role="button"><i class='fas fa-shower'></i></a>
-
+      <a href="{{ url_for('watering') }}" class="btn btn-info" role="button">
+        <i class='fas fa-shower'></i></a>
     </div>
-    <div class="col-sm-8 text-left"> 
+
+    <div class="col-sm-6 text-left"> 
       <h1>Instrucciones</h1>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+      </p>
       <hr>
       <h3>Sensores</h3>
       <p></p>
@@ -73,46 +74,40 @@
       });
      }
     });
-
-    $().button('toggle')
     </script>
 
-    <div id="random_decimal">
+      <div id="random_decimal">
       {{ lecture }}
-    <table class="table">
-      <thead>
-        <th>Pot.1</th>
-        <th>Pot.2</th>
-        <th>Sensor 1</th>
-        <th>Sensor 2</th>
-        <th>Sensor 3</th>
-        <th>Sensor 4</th>
-      </thead>
-      <tbody>
-      {% for i in table_data %}
-         {% if loop.index0 is divisibleby(6) %}
-            <tr>
-             {% endif %}
-                <td>{{i}}</td>
-             {% if loop.index is divisibleby(6) %}
-            </tr>
-          {% endif %}
-      {% endfor %}
-    </tbody>
-  </table>
-    </div>
-</div>
-
-
-    <div class="col-sm-2 sidenav">
-      <div class="well">
-        <img class="thumbnail img-responsive" src="/plot.png" alt="Grafica 1">
-      </div>
-      <div class="well">
-        <p>Grafica 2</p>
+        <table class="table">
+          <thead>
+            <th>Pot.1</th>
+            <th>Pot.2</th>
+            <th>Sensor 1</th>
+            <th>Sensor 2</th>
+            <th>Sensor 3</th>
+            <th>Sensor 4</th>
+          </thead>
+          <tbody>
+             {% for i in table_data %}
+                 {% if loop.index0 is divisibleby(6) %}
+                <tr>
+                 {% endif %}
+                  <td>{{i}}</td>
+                 {% if loop.index is divisibleby(6) %}
+                </tr>
+                 {% endif %}
+             {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
- </div>
+
+
+    <div class="col-sm-4 sidenav">
+        <img class="thumbnail img-responsive" src="/plot.png" alt="Sensor 1">
+    </div>
+
+  </div>
 </div>
 
 <footer class="container-fluid text-center">
