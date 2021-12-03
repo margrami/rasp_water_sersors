@@ -25,6 +25,12 @@ h1,h2,h3,h4,label.lead,.btn,.form-group,.navbar a, thead
       background-color: #f1f1f1;
       height: 100%;
     }
+
+    .sidebar-bg {
+      padding-top: 20px;
+      background-color: #f1f1f1;
+      height: 100%;
+    }
     
     /* Set black background color, white text and some padding */
     footer {
