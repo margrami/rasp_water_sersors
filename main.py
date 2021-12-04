@@ -12,11 +12,12 @@ from MCP3008 import MCP3008
 
 app = Flask(__name__)
 
-#database
+# database
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://///media/pi/exdrive1/rasServer/db/wdb.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+activateFlag = False
 
 
 class Sensor(db.Model):
@@ -38,10 +39,11 @@ class Sensor(db.Model):
     
 
 db.create_all()
-#/database
-
+# global variables
 adc = MCP3008()
 channels = [0, 1, 2, 3, 4, 5]
+channelsPlantName = [(0, 'pot1'), (2, 'pot2'), (3, 'Juda_sensor_1'), 
+                    (4, 'Juda_sensor_2'), (4, 'Brazito_1'), (5, 'Brazito_2')]
 sleepTime = 1
 
 
@@ -49,18 +51,35 @@ def val(x):
     # function to read the ADC  
     return round(adc.read( channel = x ) /1023.0 *3.3, 2)
 
+
 def print_interator(it):
     # function to print the values in a interator object (map)
     for x in it:
         print(x, end = '       ')
     print('')
 
-def print_dico(dic):
+
+def printDico(dic):
     for k, v in dic.items():
         print(k, v)
 
+
 def sensorQuery(sensorNum):
     return 'SELECT value FROM Sensor WHERE number={0} ORDER BY time'.format(sensorNum)
+
+
+def sensorWriteDb(sensorNum, plantNa):
+    dateraw = datetime.datetime.now()
+    lecture = Sensor(number=sensorNum, 
+                     time=dateraw, 
+                     plantName=plantNa, 
+                     value=round(val(sensorNum), 1), 
+                     watering=False, 
+                     wateringML=30)
+    db.session.add(lecture)
+    x = db.session.commit()
+    if x:
+        print(x)
 
 
 def createFigure(sensorNum):
@@ -69,14 +88,14 @@ def createFigure(sensorNum):
     print(sensorQuery(sensorNum))
     result = db.engine.execute(sensorQuery(sensorNum))
     result_as_list = result.fetchall()
-    #for row in result_as_list:
-    #    print(row)
     ys = list(result_as_list) # type is class list
     xs = range(result_as_list.__len__()) # type is class range
+    axis.set_title('Sensor_{0}'.format(int(sensorNum)-1))
     axis.grid(True)
+    axis.set_ylabel('[v]')
+    axis.set_xlabel('samples')
     axis.plot(xs, ys)
     return fig
-
 
 
 @app.route('/')
@@ -90,14 +109,10 @@ def updatedecimal():
     dateraw = datetime.datetime.now()
     lectureHour = dateraw.strftime("%y-%m-%d_%H:%M:%S")
     table_data = map(lambda x: val(x), channels)
-    lecture = Sensor(number=3, 
-                     time=dateraw, 
-                     plantName='albaca', 
-                     value=val(3), 
-                     watering=False, 
-                     wateringML=30)
-    db.session.add(lecture)
-    db.session.commit()
+    for index, tuples in enumerate(channelsPlantName):
+        x = tuples[0]
+        y = tuples[1]
+        sensorWriteDb(x, y)
     return jsonify('', render_template('random_decimal_model.html', 
                        lecture = lectureHour, table_data = table_data))
 
@@ -107,12 +122,23 @@ def watering():
     return render_template ('home.html', w = 'registrado') 
 
 
+@app.route('/upgrade')
+def upgradeFig():
+    for index, tuples in enumerate(channelsPlantName):
+        x = tuples[0]
+        y = tuples[1]
+        sensorWriteDb(x, y)
+
+    return render_template('upgradeFig.html')
+
+
 @app.route ('/plot1.png')
 def plot1_png():
     fig = createFigure(2)
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
+
 
 @app.route ('/plot2.png')
 def plot2_png():
@@ -121,18 +147,21 @@ def plot2_png():
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
 
-# def create_figure():
-#     fig = Figure()
-#     axis = fig.add_subplot(1, 1, 1)
-#     result = db.engine.execute(sensorQuery(2))
-#     result_as_list = result.fetchall()
-#     #for row in result_as_list:
-#     #    print(row)
-#     ys = list(result_as_list) # type is class list
-#     xs = range(result_as_list.__len__()) # type is class range
-#     axis.grid(True)
-#     axis.plot(xs, ys)
-#     return fig
+
+@app.route ('/plot3.png')
+def plot3_png():
+    fig = createFigure(4)
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
+
+
+@app.route ('/plot4.png')
+def plot4_png():
+    fig = createFigure(5)
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
 
 
 if __name__ == '__main__':
