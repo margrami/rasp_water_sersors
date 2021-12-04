@@ -17,7 +17,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://///media/pi/exdrive1/rasServer/db/wdb.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-activateFlag = False
+activate_flag = False
 
 
 class Sensor(db.Model):
@@ -42,9 +42,9 @@ db.create_all()
 # global variables
 adc = MCP3008()
 channels = [0, 1, 2, 3, 4, 5]
-channelsPlantName = [(0, 'pot1'), (2, 'pot2'), (3, 'Juda_sensor_1'), 
+channels_plant_name = [(0, 'pot1'), (2, 'pot2'), (3, 'Juda_sensor_1'), 
                     (4, 'Juda_sensor_2'), (4, 'Brazito_1'), (5, 'Brazito_2')]
-sleepTime = 1
+sleep_time = 1
 
 
 def val(x):
@@ -59,16 +59,16 @@ def print_interator(it):
     print('')
 
 
-def printDico(dic):
+def print_dico(dic):
     for k, v in dic.items():
         print(k, v)
 
 
-def sensorQuery(sensorNum):
+def sensor_query(sensorNum):
     return 'SELECT value FROM Sensor WHERE number={0} ORDER BY time'.format(sensorNum)
 
 
-def sensorWriteDb(sensorNum, plantNa):
+def sensor_write_db(sensorNum, plantNa):
     dateraw = datetime.datetime.now()
     lecture = Sensor(number=sensorNum, 
                      time=dateraw, 
@@ -82,11 +82,11 @@ def sensorWriteDb(sensorNum, plantNa):
         print(x)
 
 
-def createFigure(sensorNum):
+def create_figure(sensorNum):
     fig = Figure()
     axis = fig.add_subplot(1, 1, 1)
-    print(sensorQuery(sensorNum))
-    result = db.engine.execute(sensorQuery(sensorNum))
+    print(sensor_query(sensorNum))
+    result = db.engine.execute(sensor_query(sensorNum))
     result_as_list = result.fetchall()
     ys = list(result_as_list) # type is class list
     xs = range(result_as_list.__len__()) # type is class range
@@ -105,16 +105,17 @@ def index():
 
 
 @app.route('/update_decimal', methods=['POST'])
-def updatedecimal():
+def update_decimal():
     dateraw = datetime.datetime.now()
-    lectureHour = dateraw.strftime("%y-%m-%d_%H:%M:%S")
+    lecture_hour = dateraw.strftime("%y-%m-%d_%H:%M:%S")
     table_data = map(lambda x: val(x), channels)
-    for index, tuples in enumerate(channelsPlantName):
+    for index, tuples in enumerate(channels_plant_name):
         x = tuples[0]
         y = tuples[1]
-        sensorWriteDb(x, y)
+        sensor_write_db(x, y)
     return jsonify('', render_template('random_decimal_model.html', 
-                       lecture = lectureHour, table_data = table_data))
+                       lecture = lecture_hour, 
+                       table_data = table_data))
 
 
 @app.route('/watering')
@@ -123,18 +124,17 @@ def watering():
 
 
 @app.route('/upgrade')
-def upgradeFig():
-    for index, tuples in enumerate(channelsPlantName):
+def upgrade_fig():
+    for index, tuples in enumerate(channels_plant_name):
         x = tuples[0]
         y = tuples[1]
-        sensorWriteDb(x, y)
-
+        sensor_write_db(x, y)
     return render_template('upgradeFig.html')
 
 
 @app.route ('/plot1.png')
 def plot1_png():
-    fig = createFigure(2)
+    fig = create_figure(2)
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
@@ -142,7 +142,7 @@ def plot1_png():
 
 @app.route ('/plot2.png')
 def plot2_png():
-    fig = createFigure(3)
+    fig = create_figure(3)
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
@@ -150,7 +150,7 @@ def plot2_png():
 
 @app.route ('/plot3.png')
 def plot3_png():
-    fig = createFigure(4)
+    fig = create_figure(4)
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
@@ -158,7 +158,7 @@ def plot3_png():
 
 @app.route ('/plot4.png')
 def plot4_png():
-    fig = createFigure(5)
+    fig = create_figure(5)
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
