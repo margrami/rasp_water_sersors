@@ -1,50 +1,25 @@
-from flask import Flask, render_template, jsonify, Response
-from flask_sqlalchemy import SQLAlchemy
+from myapp import app, db
+from myapp.models import Sensor
+from flask import render_template, jsonify, Response
+from MCP3008 import MCP3008
 import numpy as np
 import sys
 import datetime
 import logging
 import io
+import config
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
-from time import sleep
-from MCP3008 import MCP3008
-
-app = Flask(__name__)
-
-# database
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://///media/pi/exdrive1/rasServer/db/wdb.sqlite'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
-activate_flag = False
 
 
-class Sensor(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    number = db.Column(db.Integer, nullable=False)
-    time = db.Column(db.DateTime, nullable=False) 
-    plantName = db.Column(db.String(32), nullable=False )
-    value = db.Column(db.Float, nullable=False)
-    watering = db.Column(db.Boolean)
-    wateringML = db.Column(db.Integer)
 
-    def to_dict(self):
-        return {
-             'id': self.id,
-             'number': self.number,
-             'time': self.time,
-             'value': self.value
-        }
-    
 
-db.create_all()
+
 # global variables
 adc = MCP3008()
 channels = [0, 1, 2, 3, 4, 5]
 channels_plant_name = [(0, 'pot1'), (2, 'pot2'), (3, 'Juda_sensor_1'), 
-                    (4, 'Juda_sensor_2'), (4, 'Brazito_1'), (5, 'Brazito_2')]
-sleep_time = 1
+                       (4, 'Juda_sensor_2'), (4, 'Brazito_1'), (5, 'Brazito_2')]
 
 
 def val(x):
@@ -90,12 +65,13 @@ def create_figure(sensorNum):
     result_as_list = result.fetchall()
     ys = list(result_as_list) # type is class list
     xs = range(result_as_list.__len__()) # type is class range
-    axis.set_title('Sensor_{0}'.format(int(sensorNum)-1))
+    axis.set_title('Sensor_{0}'.format(int(sensorNum)-1)) # replace this
     axis.grid(True)
     axis.set_ylabel('[v]')
     axis.set_xlabel('samples')
     axis.plot(xs, ys)
     return fig
+
 
 
 @app.route('/')
@@ -162,7 +138,3 @@ def plot4_png():
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
-
-
-if __name__ == '__main__':
-    app.run(debug=True, port=80, host='0.0.0.0')
