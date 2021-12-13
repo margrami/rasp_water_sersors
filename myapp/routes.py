@@ -5,14 +5,10 @@ from MCP3008 import MCP3008
 import numpy as np
 import sys
 import datetime
-import logging
-import io
 import config
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
-
-
-
+import io
 
 
 # global variables
@@ -43,20 +39,6 @@ def sensor_query(sensorNum):
     return 'SELECT value FROM Sensor WHERE number={0} ORDER BY time'.format(sensorNum)
 
 
-def sensor_write_db(sensorNum, plantNa):
-    dateraw = datetime.datetime.now()
-    lecture = Sensor(number=sensorNum, 
-                     time=dateraw, 
-                     plantName=plantNa, 
-                     value=round(val(sensorNum), 1), 
-                     watering=False, 
-                     wateringML=30)
-    db.session.add(lecture)
-    x = db.session.commit()
-    if x:
-        print(x)
-
-
 def create_figure(sensorNum):
     fig = Figure()
     axis = fig.add_subplot(1, 1, 1)
@@ -73,7 +55,6 @@ def create_figure(sensorNum):
     return fig
 
 
-
 @app.route('/')
 def index():
     table_data = map(lambda x: val(x), channels)
@@ -85,10 +66,6 @@ def update_decimal():
     dateraw = datetime.datetime.now()
     lecture_hour = dateraw.strftime("%y-%m-%d_%H:%M:%S")
     table_data = map(lambda x: val(x), channels)
-    for index, tuples in enumerate(channels_plant_name):
-        x = tuples[0]
-        y = tuples[1]
-        sensor_write_db(x, y)
     return jsonify('', render_template('random_decimal_model.html', 
                        lecture = lecture_hour, 
                        table_data = table_data))

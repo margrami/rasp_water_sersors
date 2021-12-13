@@ -8,7 +8,7 @@ import datetime
 from time import sleep
 
 
-secondsinterval = 10
+secondsinterval = 60
 adc = MCP3008()
 channels = [0, 1, 2, 3, 4, 5]
 channels_plant_name = [(0, 'pot1'), (2, 'pot2'), (3, 'Juda_sensor_1'), 
@@ -33,7 +33,7 @@ def sensor_write_db(sensorNum, plantNa):
     db.session.commit()
 
 
-for i in range(10):
+for i in range(4500):
     dateraw = datetime.datetime.now()
     lecture_hour = dateraw.strftime("%y-%m-%d_%H:%M:%S")
     for index, tuples in enumerate(channels_plant_name):
@@ -41,7 +41,6 @@ for i in range(10):
         y = tuples[1]
         sensor_write_db(x, y)
         sleep(secondsinterval)
-print('Done!')
 
-if __name__ == "__main__":
-	main()
+#if __name__ == "__main__":
+#	main()
