@@ -47,12 +47,30 @@
     </div>
 
     <div class="col-sm-6 text-left"> 
-      <h1>Instrucciones</h1>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-      </p>
+      <h1>Configuration</h1>
+      <p>Identify where the sensors are installed</p>
+    <form class="form-group row" action={{ url_for('configuration') }} method="post">
+       <div class="form-group">
+       <label for="FormCustomSelectPref">Sensor #:</label>
+       <select class="form-control" id="FormCustomSelectPref" name="sen_name">
+          <option selected>Choose Sensor...</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="formControlDefault">Plant Name:</label>
+      <input type="text" class="form-control" id="formControlDefault" placeholder="Enter plant name" name="plant_name">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
       <hr>
-      <h3>Sensores</h3>
-      <p></p>
+      <h3>Sensors</h3>
+      <p>Online Sensors activity</p>
 
        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script>

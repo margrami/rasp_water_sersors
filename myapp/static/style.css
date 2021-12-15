@@ -79,3 +79,17 @@ h1,h2,h3,h4,label.lead,.btn,.form-group,.navbar a, thead
     background-color: #b32f07;
     border-color: #ede4e0;
 }
+
+
+.form-group, form-group row {
+    margin-bottom: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #2e6da4;
+    border-color: #2e6da4;
+    margin-left: 10px;
+}

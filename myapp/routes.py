@@ -1,6 +1,6 @@
 from myapp import app, db
 from myapp.models import Sensor
-from flask import render_template, jsonify, Response
+from flask import render_template, jsonify, Response, request
 from MCP3008 import MCP3008
 import numpy as np
 import sys
@@ -73,6 +73,16 @@ def update_decimal():
 
 @app.route('/watering')
 def watering():
+    return render_template ('home.html', w = 'registrado') 
+
+
+@app.route('/config', methods=["POST"])
+def configuration():
+    x = request.form.get("sen_name")
+    y = request.form.get("plant_name")
+    channels_plant_name[int(x)-1] = (int(x), str(y))
+    for (i,j) in channels_plant_name:
+        print(i ,j)   
     return render_template ('home.html', w = 'registrado') 
 
 

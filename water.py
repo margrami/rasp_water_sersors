@@ -11,8 +11,8 @@ from time import sleep
 secondsinterval = 60
 adc = MCP3008()
 channels = [0, 1, 2, 3, 4, 5]
-channels_plant_name = [(0, 'pot1'), (2, 'pot2'), (3, 'Juda_sensor_1'), 
-                       (4, 'Juda_sensor_2'), (4, 'Brazito_1'), (5, 'Brazito_2')]
+#channels_plant_name = [(0, 'pot1'), (2, 'pot2'), (3, 'Juda_sensor_1'), 
+#                       (4, 'Juda_sensor_2'), (4, 'Brazito_1'), (5, 'Brazito_2')]
 
 
 
