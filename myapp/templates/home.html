@@ -49,25 +49,48 @@
     <div class="col-sm-6 text-left"> 
       <h1>Configuration</h1>
       <p>Identify where the sensors are installed</p>
+  
+      <table class="table table-borderless">
+         <thead>
+           <tr>
+             <th>channel</th>
+             <th>sensor #</th>
+             <th>plant name</th>
+           </tr>
+        </thead>
+        <tbody>
+          {% for (x, y) in sensor_table %}
+           <tr>
+            <td>{{x}} </td>
+            <td>{{x-1 }} </td>
+            <td>{{y}} </td>
+           </tr>
+           {% endfor %}
+
+        </tbody>
+     </table>
+
+    {% block content %}
     <form class="form-group row" action={{ url_for('configuration') }} method="post">
        <div class="form-group">
-       <label for="FormCustomSelectPref">Sensor #:</label>
-       <select class="form-control" id="FormCustomSelectPref" name="sen_name">
-          <option selected>Choose Sensor...</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-          <option value="7">7</option>
-          <option value="8">8</option>
+       <label for="validationCustom04">Sensor #:</label>
+       <select class="form-control" id="validationCustom04" name="sen_name" required>
+          <option selected disabled>Choose Sensor...</option>
+          <option value="2">1</option>
+          <option value="3">2</option>
+          <option value="4">3</option>
+          <option value="5">4</option>
+          <!--option value="7">7</option>
+          <option value="8">8</option-->
       </select>
     </div>
     <div class="form-group">
-      <label for="formControlDefault">Plant Name:</label>
-      <input type="text" class="form-control" id="formControlDefault" placeholder="Enter plant name" name="plant_name">
+      <label for="validationCustom05">Plant Name:</label>
+      <input type="text" class="form-control" id="validationCustom05" placeholder="Enter plant name" name="plant_name" required>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
+    </form>
+    {% endblock %}
       <hr>
       <h3>Sensors</h3>
       <p>Online Sensors activity</p>
@@ -98,12 +121,12 @@
       {{ lecture }}
         <table class="table">
           <thead>
-            <th>Pot.1</th>
-            <th>Pot.2</th>
-            <th>Sensor 1</th>
-            <th>Sensor 2</th>
-            <th>Sensor 3</th>
-            <th>Sensor 4</th>
+            <th>Pot.1(0)</th>
+            <th>Pot.2(1)</th>
+            <th>Sensor 1(2)</th>
+            <th>Sensor 2(3)</th>
+            <th>Sensor 3(4)</th>
+            <th>Sensor 4(5)</th>
           </thead>
           <tbody>
              {% for i in table_data %}
@@ -124,8 +147,8 @@
     <div class="col-sm-4 sidebar-bg">
         <img class="thumbnail img-responsive" src="/plot1.png" alt="Sensor 1">
         <img class="thumbnail img-responsive" src="/plot2.png" alt="Sensor 2">
-        <img class="thumbnail img-responsive" src="/plot3.png" alt="Sensor 2">
-        <img class="thumbnail img-responsive" src="/plot4.png" alt="Sensor 2">
+        <img class="thumbnail img-responsive" src="/plot3.png" alt="Sensor 3">
+        <img class="thumbnail img-responsive" src="/plot4.png" alt="Sensor 4">
 
     </div>
   </div>

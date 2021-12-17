@@ -14,11 +14,10 @@ import io
 # global variables
 adc = MCP3008()
 channels = [0, 1, 2, 3, 4, 5]
-channels_plant_name = [(0, 'pot1'), (2, 'pot2'), (3, 'Juda_sensor_1'), 
-                       (4, 'Juda_sensor_2'), (4, 'Brazito_1'), (5, 'Brazito_2')]
+channels_plant_name = [(0, 'pot1'), (1, 'pot2'), (2, ''), 
+                       (3, ''), (4, ''), (5, ''), (6, 'N/A'), (7, 'N/A')]
 
-
-def val(x):
+def val(x:int):
     # function to read the ADC  
     return round(adc.read( channel = x ) /1023.0 *3.3, 2)
 
@@ -35,19 +34,61 @@ def print_dico(dic):
         print(k, v)
 
 
-def sensor_query(sensorNum):
-    return 'SELECT value FROM Sensor WHERE number={0} ORDER BY time'.format(sensorNum)
+def print_tuples_list(it):
+    for (x,y) in it:
+        print(x , y)
 
 
-def create_figure(sensorNum):
+def messure_query(sensorNum:int):
+    return 'SELECT value FROM Messures WHERE sensor_id={0} ORDER BY time'.format(sensorNum)
+
+
+def sensor_write_db_1(sensorNum:int, plantNa:str):
+    # to be used the 1st time, otherwise the update doesn't work
+    lecture = Sensor(number=sensorNum, 
+                     plantName=plantNa)
+    db.session.add(lecture)
+    db.session.commit()
+
+
+def sensor_write_db(sensorNum:int, plantNa:str):
+    # this is the procedure to update in sqlalchemy
+    # use to upgrate the Sensor.plantName - to updating Don't forget the dict
+    rows_changed = Sensor.query.filter_by(number=sensorNum).update(dict(plantName=str(plantNa)))
+    db.session.commit()
+
+
+def sensor_config_query(sensorNum:str):
+    # this is just the query text. Must be uses with the db.engine.execute command.
+    return 'SELECT plantName FROM Sensor WHERE number={0}'.format(sensorNum)
+
+
+def confirm_config():
+    """
+    Populate the structure channels_plant_name: list of tuples from info in Sensor db 
+    The db_session.execute(query) returns a ResultProxy object
+    The ResultProxy object is made up of RowProxy objects
+    The RowProxy object has an .items() method that returns key, value tuples 
+    of all the items in the row, which can be unpacked as key, value in a for operation.
+    [{column: value for column, value in rowproxy.items()} for rowproxy in resultproxy]
+    """
+
+    for i in range(2,8):
+        y = db.engine.execute(sensor_config_query(i))
+        for _row in y:
+            for column, value in _row.items():
+                channels_plant_name[int(i)] = (i, str(value))
+
+
+def create_figure(sensorNum:int):
     fig = Figure()
     axis = fig.add_subplot(1, 1, 1)
-    print(sensor_query(sensorNum))
-    result = db.engine.execute(sensor_query(sensorNum))
+    result = db.engine.execute(messure_query(sensorNum))
     result_as_list = result.fetchall()
     ys = list(result_as_list) # type is class list
     xs = range(result_as_list.__len__()) # type is class range
-    axis.set_title('Sensor_{0}'.format(int(sensorNum)-1)) # replace this
+    _tuple = channels_plant_name[sensorNum]
+    axis.set_title('Sensor_{0} {1}'.format(int(sensorNum)-1, _tuple[1])) # replace this
     axis.grid(True)
     axis.set_ylabel('[v]')
     axis.set_xlabel('samples')
@@ -57,8 +98,10 @@ def create_figure(sensorNum):
 
 @app.route('/')
 def index():
+    confirm_config()
     table_data = map(lambda x: val(x), channels)
-    return render_template('home.html', table_data = table_data )
+    return render_template('home.html', table_data = table_data, 
+                                        sensor_table=channels_plant_name)
 
 
 @app.route('/update_decimal', methods=['POST'])
@@ -78,12 +121,17 @@ def watering():
 
 @app.route('/config', methods=["POST"])
 def configuration():
-    x = request.form.get("sen_name")
-    y = request.form.get("plant_name")
-    channels_plant_name[int(x)-1] = (int(x), str(y))
-    for (i,j) in channels_plant_name:
-        print(i ,j)   
-    return render_template ('home.html', w = 'registrado') 
+    try:
+        x = request.form.get("sen_name")
+        y = request.form.get("plant_name")
+        channels_plant_name[int(x)] = (int(x), str(y))
+        sensor_write_db(x, y)
+        return render_template ('home.html', w = 'registrado', 
+                                             sensor_table=channels_plant_name)
+    except:
+        message = 'Selecione un sensor!'
+        return render_template ('error.html', message = message, 
+                                              sensor_table=channels_plant_name )
 
 
 @app.route('/upgrade')
