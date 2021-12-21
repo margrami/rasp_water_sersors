@@ -57,10 +57,14 @@ def sensor_write_db(sensorNum:int, plantNa:str):
     rows_changed = Sensor.query.filter_by(number=sensorNum).update(dict(plantName=str(plantNa)))
     db.session.commit()
 
-
 def sensor_config_query(sensorNum:str):
     # this is just the query text. Must be uses with the db.engine.execute command.
     return 'SELECT plantName FROM Sensor WHERE number={0}'.format(sensorNum)
+
+
+def messure_query_1day_ago(sensorNum:str):
+    # this is just the query's text. Must be uses with the db.engine.execute command.
+    return 'SELECT value FROM Messures WHERE sensor_id={0} AND time >= date("now","-1 day") ORDER BY time'.format(sensorNum)
 
 
 def confirm_config():
@@ -83,7 +87,8 @@ def confirm_config():
 def create_figure(sensorNum:int):
     fig = Figure()
     axis = fig.add_subplot(1, 1, 1)
-    result = db.engine.execute(messure_query(sensorNum))
+    #result = db.engine.execute(messure_query(sensorNum))
+    result = db.engine.execute(messure_query_1day_ago(sensorNum))
     result_as_list = result.fetchall()
     ys = list(result_as_list) # type is class list
     xs = range(result_as_list.__len__()) # type is class range

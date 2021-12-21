@@ -59,7 +59,7 @@ for i in range(4500):
         x = tuples[0]
         y = tuples[1]
         sensor_write_db(x, y)
-        sleep(secondsinterval)
+    sleep(secondsinterval)
 
 #if __name__ == "__main__":
 #	main()
