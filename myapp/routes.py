@@ -2,6 +2,7 @@ from myapp import app, db
 from myapp.models import Sensor
 from flask import render_template, jsonify, Response, request
 from MCP3008 import MCP3008
+import RPi.GPIO as GPIO
 import numpy as np
 import sys
 import datetime
@@ -9,6 +10,7 @@ import config
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import io
+from time import sleep
 
 
 # global variables
@@ -16,6 +18,11 @@ adc = MCP3008()
 channels = [0, 1, 2, 3, 4, 5]
 channels_plant_name = [(0, 'pot1'), (1, 'pot2'), (2, ''), 
                        (3, ''), (4, ''), (5, ''), (6, 'N/A'), (7, 'N/A')]
+
+init = False
+GPIO.setmode(GPIO.BCM) # use BCM numbering pin numbers
+
+# ------------------
 
 def val(x:int):
     # function to read the ADC  
@@ -101,6 +108,20 @@ def create_figure(sensorNum:int):
     return fig
 
 
+def init_output(pin):
+    # motor function, to setup the motor's pins as output 
+    GPIO.setup(pin, GPIO.OUT) # set up channel as an output.
+    GPIO.output(pin, GPIO.HIGH) # set the motor in 1 because it is inversed logic
+
+
+def manual_pump(pump_pin:int, delay:int):
+    init_output(pump_pin)
+    GPIO.output(pump_pin, GPIO.LOW)
+    #sleep(1)
+    #GPIO.output(pump_pin, GPIO.HIGH)
+    #sleep(1)
+
+
 @app.route('/')
 def index():
     confirm_config()
@@ -117,11 +138,6 @@ def update_decimal():
     return jsonify('', render_template('random_decimal_model.html', 
                        lecture = lecture_hour, 
                        table_data = table_data))
-
-
-@app.route('/watering')
-def watering():
-    return render_template ('home.html', w = 'registrado') 
 
 
 @app.route('/config', methods=["POST"])
@@ -146,6 +162,22 @@ def upgrade_fig():
         y = tuples[1]
         sensor_write_db(x, y)
     return render_template('upgradeFig.html')
+
+
+@app.route('/activate_motor/<int:motor_num>')
+def activate_motor(motor_num):
+    my_text ='activate_estoy'
+    print(my_text, motor_num)
+    manual_pump(motor_num, 1)
+    return render_template('home.html', message=my_text)
+
+
+@app.route('/stop_motor/<int:motor_num>')
+def stop_motor(motor_num):
+    my_text ='stop_estoy'
+    init_output(motor_num)
+    print(my_text, motor_num)
+    return render_template('home.html', message=my_text)
 
 
 @app.route ('/plot1.png')
@@ -178,3 +210,5 @@ def plot4_png():
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
+
+
