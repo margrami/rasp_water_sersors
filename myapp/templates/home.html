@@ -162,34 +162,41 @@
 
             function loadDoc(motorNum) {
              const xhttp = new XMLHttpRequest();
-             var checkBox = document.getElementById("myCheck");
+             var checkBox = document.getElementById("mycheck");
              var text = document.getElementById("text");
   
              if (checkBox.checked == true){
-                       text.style.display = "block";
-                       xhttp.onload = function() {
-                       document.getElementById("demo").innerHTML = this.responseText;
-                       }
+                       //text.style.display = "block";
                        xhttp.open("GET", "/activate_motor/" + `${motorNum}`);
+                       xhttp.onload = function() {
+                        const response = xhttp.responseText;
+                        document.querySelector('#text').innerHTML = response;
+                        return false;
+                       };
+                       
                        xhttp.send();
                 } else {
-                     text.style.display = "none";
+                     //text.style.display = "none";
                      xhttp.open("GET", "/stop_motor/" + `${motorNum}`);
+                     xhttp.onload = function() {
+                        const response = xhttp.responseText;
+                        document.querySelector('#text').innerHTML = response;
+                        return false;
+                       };
                      xhttp.send();
-                  }
-
-
-             
+                  };
              }
         </script>
 
         <!-- Rounded switch -->
-        <p id="text" style="display:none">Motor 1 is activated!</p>
+        <!--p id="text" style="display:none"></pc-->
+        <p id="text"></p>
+
         <label class="switch">
         <input type="checkbox" id="myCheck" onclick="loadDoc(17)">
         <span class="slider round"></span>
         </label>
-        <p id="text" style="display:none">Motor 2 is activated!</p>
+
         <label class="switch">
         <input type="checkbox" id="myCheck" onclick="loadDoc(27)">
         <span class="slider round"></span>

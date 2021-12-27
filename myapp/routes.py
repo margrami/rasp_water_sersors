@@ -166,18 +166,18 @@ def upgrade_fig():
 
 @app.route('/activate_motor/<int:motor_num>')
 def activate_motor(motor_num):
-    my_text ='activate_estoy'
+    my_text ='activate motor {0}'.format(str(motor_num))
     print(my_text, motor_num)
     manual_pump(motor_num, 1)
-    return render_template('home.html', message=my_text)
+    return my_text
 
 
 @app.route('/stop_motor/<int:motor_num>')
 def stop_motor(motor_num):
-    my_text ='stop_estoy'
+    my_text ='motor {0} stop'.format(str(motor_num))
     init_output(motor_num)
     print(my_text, motor_num)
-    return render_template('home.html', message=my_text)
+    return my_text
 
 
 @app.route ('/plot1.png')
