@@ -2,7 +2,7 @@
 @import url(https://fonts.googleapis.com/css?family=Voltaire);
 
 /* use special fonts in certain elements */
-h1,h2,h3,h4,label.lead,.btn,.form-group,.navbar a, thead 
+h1,h2,h3,h4,label.lead,.btn,.form-group,.navbar a, thead, p 
 {
   text-transform:uppercase;
   font-family:'Voltaire',Arial,sans-serif;

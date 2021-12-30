@@ -50,7 +50,7 @@ def messure_query(sensorNum:int):
     return 'SELECT value FROM Messures WHERE sensor_id={0} ORDER BY time'.format(sensorNum)
 
 
-def sensor_write_db_1(sensorNum:int, plantNa:str):
+def sensor_write_db_x(sensorNum:int, plantNa:str):
     # to be used the 1st time, otherwise the update doesn't work
     lecture = Sensor(number=sensorNum, 
                      plantName=plantNa)
@@ -105,6 +105,7 @@ def create_figure(sensorNum:int):
     axis.set_ylabel('[v]')
     axis.set_xlabel('samples')
     axis.plot(xs, ys)
+    print('en create_figure')
     return fig
 
 
@@ -125,9 +126,11 @@ def manual_pump(pump_pin:int, delay:int):
 @app.route('/')
 def index():
     confirm_config()
+    print([sensor.to_dict() for sensor in Sensor.query])
     table_data = map(lambda x: val(x), channels)
     return render_template('home.html', table_data = table_data, 
-                                        sensor_table=channels_plant_name)
+                                        sensor_table=channels_plant_name,
+                                        parent_list=[sensor.to_dict() for sensor in Sensor.query])
 
 
 @app.route('/update_decimal', methods=['POST'])
@@ -140,6 +143,7 @@ def update_decimal():
                        table_data = table_data))
 
 
+
 @app.route('/config', methods=["POST"])
 def configuration():
     try:
@@ -147,6 +151,7 @@ def configuration():
         y = request.form.get("plant_name")
         channels_plant_name[int(x)] = (int(x), str(y))
         sensor_write_db(x, y)
+
         return render_template ('home.html', w = 'registrado', 
                                              sensor_table=channels_plant_name)
     except:
@@ -166,7 +171,7 @@ def upgrade_fig():
 
 @app.route('/activate_motor/<int:motor_num>')
 def activate_motor(motor_num):
-    my_text ='activate motor {0}'.format(str(motor_num))
+    my_text ='Activating Motor {0}'.format(str(motor_num))
     print(my_text, motor_num)
     manual_pump(motor_num, 1)
     return my_text
@@ -174,7 +179,7 @@ def activate_motor(motor_num):
 
 @app.route('/stop_motor/<int:motor_num>')
 def stop_motor(motor_num):
-    my_text ='motor {0} stop'.format(str(motor_num))
+    my_text ='Stopping Motor {0} '.format(str(motor_num))
     init_output(motor_num)
     print(my_text, motor_num)
     return my_text

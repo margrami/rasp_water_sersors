@@ -8,7 +8,7 @@ class Sensor(db.Model):
 
     def to_dict(self):
         return {
-             'id': self.id,
+             'number': self.number,
              'plantName': self.plantName,
         }
 

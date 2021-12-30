@@ -1,0 +1,23 @@
+en index
+parent_list=[sensor.to_dict() for sensor in Sensor.query]
+
+
+<table id="data" class="table table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Plant Name</th>
+        
+      </tr>
+    </thead>
+    <tbody>
+        {% for item in parent_list %}
+           
+          <tr>
+            <td>{{ item['number'] }} </td>
+            <td>{{ item['plantName'] }}</td>
+          </tr>
+           
+        {% endfor %}
+    </tbody>
+  </table>
