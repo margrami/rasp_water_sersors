@@ -50,7 +50,7 @@ def messure_query(sensorNum:int):
     return 'SELECT value FROM Messures WHERE sensor_id={0} ORDER BY time'.format(sensorNum)
 
 
-def sensor_write_db_x(sensorNum:int, plantNa:str):
+def sensor_write_db(sensorNum:int, plantNa:str):
     # to be used the 1st time, otherwise the update doesn't work
     lecture = Sensor(number=sensorNum, 
                      plantName=plantNa)
@@ -58,7 +58,7 @@ def sensor_write_db_x(sensorNum:int, plantNa:str):
     db.session.commit()
 
 
-def sensor_write_db(sensorNum:int, plantNa:str):
+def sensor_write_db_x(sensorNum:int, plantNa:str):
     # this is the procedure to update in sqlalchemy
     # use to upgrate the Sensor.plantName - to updating Don't forget the dict
     rows_changed = Sensor.query.filter_by(number=sensorNum).update(dict(plantName=str(plantNa)))
@@ -131,6 +131,7 @@ def index():
     return render_template('home.html', table_data = table_data, 
                                         sensor_table=channels_plant_name,
                                         parent_list=[sensor.to_dict() for sensor in Sensor.query])
+
 
 
 @app.route('/update_decimal', methods=['POST'])
