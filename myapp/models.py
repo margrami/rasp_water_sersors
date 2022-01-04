@@ -5,13 +5,13 @@ class Sensor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.Integer, nullable=False)
     plantName = db.Column(db.String(32), nullable=False)
-    motor_id = db.Column(db.Integer, db.ForeignKey("Motor.number"), nullable=False)
+    motor_number = db.Column(db.Integer, db.ForeignKey("Motor.number"), nullable=False)
 
     def to_dict(self):
         return {
              'number': self.number,
-             'plantName': self.plantName
-             'motor_id': self.motor_id
+             'plantName': self.plantName,
+             'motor_number': self.motor_number
         }
 
 

@@ -49,40 +49,56 @@
       <h1>Configuration</h1>
       <p>Identify where the sensors are installed</p>
   
-      <table class="table table-borderless">
-         <thead>
-           <tr>
-             <th>channel</th>
-             <th>sensor #</th>
-             <th>plant name</th>
-           </tr>
-        </thead>
-        <tbody>
-          {% for (x, y) in sensor_table %}
-           <tr>
-            <td>{{x}} </td>
-            <td>{{x-1 }} </td>
-            <td>{{y}} </td>
-           </tr>
-           {% endfor %}
-
-        </tbody>
-     </table>
+      <table id="data" class="table table-striped">
+    <thead>
+      <tr>
+        <th>Sensor #</th>
+        <th>ADC Ch #</th>
+        <th>Plant Name</th>
+        <th>Motor #</th>
+        
+      </tr>
+    </thead>
+    <tbody>
+        {% for item in  sensor_table %}
+           
+          <tr>
+            <td>{{ item['number'] - 1 }} </td>
+            <td>{{ item['number'] }} </td>
+            <td>{{ item['plantName'] }}</td>
+            <td>{{ item['motor_number'] }}</td>
+          </tr>
+           
+        {% endfor %}
+    </tbody>
+  </table>
 
     {% block content %}
     <form class="form-group row" action={{ url_for('configuration') }} method="post">
        <div class="form-group">
        <label for="validationCustom04">Sensor #:</label>
        <select class="form-control" id="validationCustom04" name="sen_name" required>
-          <option selected disabled>Choose Sensor...</option>
+          <option selected disabled>Choose Sensor #...</option>
           <option value="2">1</option>
           <option value="3">2</option>
           <option value="4">3</option>
           <option value="5">4</option>
           <!--option value="7">7</option >
           <option value="8">8</option  -->
-      </select>
-    </div>
+       </select>
+       </div>
+       <div class="form-group">
+       <label for="validationCustom04">Motor #:</label>
+       <select class="form-control" id="validationCustom04" name="motor_name" required>
+          <option selected disabled>Choose Motor #...</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <!--option value="7">7</option >
+          <option value="8">8</option  -->
+       </select>
+       </div>
     <div class="form-group">
       <label for="validationCustom05">Plant Name:</label>
       <input type="text" class="form-control" id="validationCustom05" placeholder="Enter plant name" name="plant_name" required>
@@ -94,7 +110,7 @@
       <h3>Sensors</h3>
       <p>Online Sensors activity</p>
 
-       <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script>
      
      $(function(){
@@ -148,18 +164,6 @@
        
 
         <script>
-            function myToogleFunction() {
-            const xhttp = new XMLHttpRequest();
-            var checkBox = document.getElementById("myCheck");
-            var text = document.getElementById("text");
-            if (checkBox.checked == true){
-                       text.style.display = "block";
-                } else {
-                     text.style.display = "none";
-               }
-              }
-
-
             function loadM1(motorNum) {
              const xhttp = new XMLHttpRequest();
              var checkBox = document.getElementById("myCheck1");
@@ -172,8 +176,7 @@
                         const response = xhttp.responseText;
                         document.querySelector('#text').innerHTML = response;
                         return false;
-                       };
-                       
+                       };                     
                        xhttp.send();
                 } else {
                      //text.style.display = "none";
@@ -200,8 +203,7 @@
                         const response = xhttp.responseText;
                         document.querySelector('#text').innerHTML = response;
                         return false;
-                       };
-                       
+                       };                      
                        xhttp.send();
                 } else {
                      //text.style.display = "none";
@@ -227,8 +229,7 @@
                         const response = xhttp.responseText;
                         document.querySelector('#text').innerHTML = response;
                         return false;
-                       };
-                       
+                       };                       
                        xhttp.send();
                 } else {
                      //text.style.display = "none";
@@ -254,8 +255,7 @@
                         const response = xhttp.responseText;
                         document.querySelector('#text').innerHTML = response;
                         return false;
-                       };
-                       
+                       }; 
                        xhttp.send();
                 } else {
                      //text.style.display = "none";

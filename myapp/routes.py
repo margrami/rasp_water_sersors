@@ -50,19 +50,22 @@ def messure_query(sensorNum:int):
     return 'SELECT value FROM Messures WHERE sensor_id={0} ORDER BY time'.format(sensorNum)
 
 
-def sensor_write_db(sensorNum:int, plantNa:str):
+def sensor_write_db_x(sensorNum:int, plantNa:str, motorNum:int):
     # to be used the 1st time, otherwise the update doesn't work
     lecture = Sensor(number=sensorNum, 
-                     plantName=plantNa)
+                     plantName=plantNa,
+                     motor_number=motorNum)
     db.session.add(lecture)
     db.session.commit()
 
 
-def sensor_write_db_x(sensorNum:int, plantNa:str):
+def sensor_write_db(sensorNum:int, plantNa:str, motorNum:int):
     # this is the procedure to update in sqlalchemy
     # use to upgrate the Sensor.plantName - to updating Don't forget the dict
-    rows_changed = Sensor.query.filter_by(number=sensorNum).update(dict(plantName=str(plantNa)))
+    rows_changed = Sensor.query.filter_by(number=sensorNum).update(dict(plantName=str(plantNa), 
+                                                                        motor_number=motorNum))
     db.session.commit()
+
 
 def sensor_config_query(sensorNum:str):
     # this is just the query text. Must be uses with the db.engine.execute command.
@@ -128,10 +131,8 @@ def index():
     confirm_config()
     print([sensor.to_dict() for sensor in Sensor.query])
     table_data = map(lambda x: val(x), channels)
-    return render_template('home.html', table_data = table_data, 
-                                        sensor_table=channels_plant_name,
-                                        parent_list=[sensor.to_dict() for sensor in Sensor.query])
-
+    return render_template('home.html', table_data = table_data,
+                                        sensor_table=[sensor.to_dict() for sensor in Sensor.query])
 
 
 @app.route('/update_decimal', methods=['POST'])
@@ -144,21 +145,20 @@ def update_decimal():
                        table_data = table_data))
 
 
-
 @app.route('/config', methods=["POST"])
 def configuration():
     try:
         x = request.form.get("sen_name")
         y = request.form.get("plant_name")
+        z = request.form.get("motor_name")
         channels_plant_name[int(x)] = (int(x), str(y))
-        sensor_write_db(x, y)
-
+        sensor_write_db(x, y, z)
         return render_template ('home.html', w = 'registrado', 
-                                             sensor_table=channels_plant_name)
+                                             sensor_table = [sensor.to_dict() for sensor in Sensor.query])
     except:
         message = 'Selecione un sensor!'
         return render_template ('error.html', message = message, 
-                                              sensor_table=channels_plant_name )
+                                              sensor_table = [sensor.to_dict() for sensor in Sensor.query])
 
 
 @app.route('/upgrade')
