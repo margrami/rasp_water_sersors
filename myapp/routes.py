@@ -16,15 +16,6 @@ from time import sleep
 # global variables
 adc = MCP3008()
 channels = [0, 1, 2, 3, 4, 5]
-channels_plant_name = [(0, 'pot1'), (1, 'pot2'), (2, ''), 
-                       (3, ''), (4, ''), (5, ''), (6, 'N/A'), (7, 'N/A')]
-
-# {'data': [{'number': 2, 'plantName': 'brazito_1', 'motor_number': 1, 'motor_GPIO_pin': 17}, 
-#          {'number': 3, 'plantName': 'brazito_2', 'motor_number': 2, 'motor_GPIO_pin': 27}, 
-#          {'number': 4, 'plantName': 'juda_1', 'motor_number': 4, 'motor_GPIO_pin': 23}, 
-#          {'number': 5, 'plantName': 'juda_2', 'motor_number': 3, 'motor_GPIO_pin': 22}]}
-
-
 init = False
 GPIO.setmode(GPIO.BCM) # use BCM numbering pin numbers
 
@@ -85,21 +76,12 @@ def messure_query_1day_ago(sensorNum:str):
     return 'SELECT value FROM Messures WHERE sensor_id={0} AND time >= date("now","-1 day") ORDER BY time'.format(sensorNum)
 
 
-def confirm_config():
-    """
-    Populate the structure channels_plant_name: list of tuples from info in Sensor db 
-    The db_session.execute(query) returns a ResultProxy object
-    The ResultProxy object is made up of RowProxy objects
-    The RowProxy object has an .items() method that returns key, value tuples 
-    of all the items in the row, which can be unpacked as key, value in a for operation.
-    [{column: value for column, value in rowproxy.items()} for rowproxy in resultproxy]
-    """
-
-    for i in range(2,8):
-        y = db.engine.execute(sensor_config_query(i))
-        for _row in y:
-            for column, value in _row.items():
-                channels_plant_name[int(i)] = (i, str(value))
+def populate_main_struct():
+    # Extract configuration on DB and populate the structure:  
+    # {'data': [{'number': 2, 'plantName': 'brazito_1', 'motor_number': 1}, 
+    # {'number': 3, 'plantName': 'brazito_2', 'motor_number': 2}, {'number': 4, 'plantName': 'juda_1', 'motor_number': 4}, 
+    # {'number': 5, 'plantName': 'juda_2', 'motor_number': 3}]}
+    return {'data':[sensor.to_dict() for sensor in Sensor.query]}
 
 
 def create_figure(sensorNum:int):
@@ -110,8 +92,8 @@ def create_figure(sensorNum:int):
     result_as_list = result.fetchall()
     ys = list(result_as_list) # type is class list
     xs = range(result_as_list.__len__()) # type is class range
-    _tuple = channels_plant_name[sensorNum]
-    axis.set_title('Sensor_{0} {1}'.format(int(sensorNum)-1, _tuple[1])) # replace this
+    _plant_name = [item['plantName'] for item in global_struture['data'] if item['number']== sensorNum]
+    axis.set_title('Sensor_{0} {1}'.format(int(sensorNum)-1, _plant_name)) # replace this
     axis.grid(True)
     axis.set_ylabel('[v]')
     axis.set_xlabel('samples')
@@ -129,19 +111,18 @@ def init_output(pin):
 def manual_pump(pump_pin:int, delay:int):
     init_output(pump_pin)
     GPIO.output(pump_pin, GPIO.LOW)
-    #sleep(1)
-    #GPIO.output(pump_pin, GPIO.HIGH)
-    #sleep(1)
+
+
+# global variables
+global_struture = populate_main_struct()
 
 
 @app.route('/')
 def index():
     confirm_config()
-    #print([sensor.to_dict() for sensor in Sensor.query])
     print({'data': [sensor.to_dict() for sensor in Sensor.query]})
     table_data = map(lambda x: val(x), channels)
     return render_template('home.html', table_data = table_data,
-                                        #sensor_table=[sensor.to_dict() for sensor in Sensor.query]
                                         sensor_table={'data': [sensor.to_dict() for sensor in Sensor.query]})
 
 
@@ -162,17 +143,13 @@ def configuration():
         y = request.form.get("plant_name")
         z = request.form.get("motor_name")
         w = request.form.get("GPIO_pin")
-        #channels_plant_name[int(x)] = (int(x), str(y))
         sensor_write_db(sensorNum=x, plantNa=y, motorNum=z, motorGPIOpin=w)
-        print('pase por aqui')
         return render_template ('home.html', w = 'registrado', 
                                              sensor_table={'data': [sensor.to_dict() for sensor in Sensor.query]})
     except:
         message = 'Selecione un sensor!'
-        return render_template ('error.html', message = message, 
-                                              #sensor_table = [sensor.to_dict() for sensor in Sensor.query]
+        return render_template ('error.html', message = message,
                                               sensor_table={'data': [sensor.to_dict() for sensor in Sensor.query]})
-
 
 
 @app.route('/activate_motor/<int:motor_num>')
