@@ -19,6 +19,12 @@ channels = [0, 1, 2, 3, 4, 5]
 channels_plant_name = [(0, 'pot1'), (1, 'pot2'), (2, ''), 
                        (3, ''), (4, ''), (5, ''), (6, 'N/A'), (7, 'N/A')]
 
+# {'data': [{'number': 2, 'plantName': 'brazito_1', 'motor_number': 1, 'motor_GPIO_pin': 17}, 
+#          {'number': 3, 'plantName': 'brazito_2', 'motor_number': 2, 'motor_GPIO_pin': 27}, 
+#          {'number': 4, 'plantName': 'juda_1', 'motor_number': 4, 'motor_GPIO_pin': 23}, 
+#          {'number': 5, 'plantName': 'juda_2', 'motor_number': 3, 'motor_GPIO_pin': 22}]}
+
+
 init = False
 GPIO.setmode(GPIO.BCM) # use BCM numbering pin numbers
 
@@ -50,20 +56,22 @@ def messure_query(sensorNum:int):
     return 'SELECT value FROM Messures WHERE sensor_id={0} ORDER BY time'.format(sensorNum)
 
 
-def sensor_write_db_x(sensorNum:int, plantNa:str, motorNum:int):
+def sensor_write_db_x(sensorNum:int, plantNa:str, motorNum:int, motorGPIOpin:int):
     # to be used the 1st time, otherwise the update doesn't work
     lecture = Sensor(number=sensorNum, 
                      plantName=plantNa,
-                     motor_number=motorNum)
+                     motor_number=motorNum,
+                     motor_GPIO_pin=motorGPIOpin)
     db.session.add(lecture)
     db.session.commit()
 
 
-def sensor_write_db(sensorNum:int, plantNa:str, motorNum:int):
+def sensor_write_db(sensorNum:int, plantNa:str, motorNum:int, motorGPIOpin:int):
     # this is the procedure to update in sqlalchemy
     # use to upgrate the Sensor.plantName - to updating Don't forget the dict
     rows_changed = Sensor.query.filter_by(number=sensorNum).update(dict(plantName=str(plantNa), 
-                                                                        motor_number=motorNum))
+                                                                        motor_number=motorNum,
+                                                                        motor_GPIO_pin=motorGPIOpin))
     db.session.commit()
 
 
@@ -129,10 +137,12 @@ def manual_pump(pump_pin:int, delay:int):
 @app.route('/')
 def index():
     confirm_config()
-    print([sensor.to_dict() for sensor in Sensor.query])
+    #print([sensor.to_dict() for sensor in Sensor.query])
+    print({'data': [sensor.to_dict() for sensor in Sensor.query]})
     table_data = map(lambda x: val(x), channels)
     return render_template('home.html', table_data = table_data,
-                                        sensor_table=[sensor.to_dict() for sensor in Sensor.query])
+                                        #sensor_table=[sensor.to_dict() for sensor in Sensor.query]
+                                        sensor_table={'data': [sensor.to_dict() for sensor in Sensor.query]})
 
 
 @app.route('/update_decimal', methods=['POST'])
@@ -151,23 +161,18 @@ def configuration():
         x = request.form.get("sen_name")
         y = request.form.get("plant_name")
         z = request.form.get("motor_name")
-        channels_plant_name[int(x)] = (int(x), str(y))
-        sensor_write_db(x, y, z)
+        w = request.form.get("GPIO_pin")
+        #channels_plant_name[int(x)] = (int(x), str(y))
+        sensor_write_db(sensorNum=x, plantNa=y, motorNum=z, motorGPIOpin=w)
+        print('pase por aqui')
         return render_template ('home.html', w = 'registrado', 
-                                             sensor_table = [sensor.to_dict() for sensor in Sensor.query])
+                                             sensor_table={'data': [sensor.to_dict() for sensor in Sensor.query]})
     except:
         message = 'Selecione un sensor!'
         return render_template ('error.html', message = message, 
-                                              sensor_table = [sensor.to_dict() for sensor in Sensor.query])
+                                              #sensor_table = [sensor.to_dict() for sensor in Sensor.query]
+                                              sensor_table={'data': [sensor.to_dict() for sensor in Sensor.query]})
 
-
-@app.route('/upgrade')
-def upgrade_fig():
-    for index, tuples in enumerate(channels_plant_name):
-        x = tuples[0]
-        y = tuples[1]
-        sensor_write_db(x, y)
-    return render_template('upgradeFig.html')
 
 
 @app.route('/activate_motor/<int:motor_num>')
