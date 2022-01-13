@@ -121,8 +121,23 @@
     </form>
     {% endblock %}
       <hr>
+    <form class="form-group row" action={{ url_for('setup_sampling_time') }} method="post">
+       <div class="form-group">
+       <label for="validationCustom04">Sampling time(s) in graphs:</label>
+       <select class="form-control" id="validationCustom04" name="samptime" required>
+          <option selected disabled>Choose Sampling Time...</option>
+          <option value="2">2s</option>
+          <option value="30">30s</option>
+          <option value="60">60s</option>
+       </select>
+       </div>
+       <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    
+    <hr>
       <h3>Sensors</h3>
       <p>Online Sensors activity</p>
+    
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script>
@@ -315,6 +330,9 @@
 
     <div class="col-sm-5 sidebar-bg">
         <h4>Samples Window Now - 24 hours</h4>
+        <div id="sampling">
+         <p>Sampling time (s) :  {{ new_sampling }} </p>
+         </div>
         <img class="thumbnail img-responsive" src="/plot1.png" alt="Sensor 1">
         <img class="thumbnail img-responsive" src="/plot2.png" alt="Sensor 2">
         <img class="thumbnail img-responsive" src="/plot3.png" alt="Sensor 3">

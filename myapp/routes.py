@@ -18,6 +18,7 @@ adc = MCP3008()
 channels = [0, 1, 2, 3, 4, 5]
 init = False
 GPIO.setmode(GPIO.BCM) # use BCM numbering pin numbers
+sampling_time = 30
 
 # ------------------
 
@@ -109,7 +110,7 @@ def init_output(pin):
 
 
 def manual_pump(pump_pin:int, delay:int):
-    init_output(pump_pin)
+    init_output(pin=pump_pin)
     GPIO.output(pump_pin, GPIO.LOW)
 
 
@@ -119,10 +120,11 @@ global_struture = populate_main_struct()
 
 @app.route('/')
 def index():
-    confirm_config()
+    #confirm_config()
     print({'data': [sensor.to_dict() for sensor in Sensor.query]})
     table_data = map(lambda x: val(x), channels)
     return render_template('home.html', table_data = table_data,
+                                        new_sampling=sampling_time,
                                         sensor_table={'data': [sensor.to_dict() for sensor in Sensor.query]})
 
 
@@ -135,6 +137,13 @@ def update_decimal():
                        lecture = lecture_hour, 
                        table_data = table_data))
 
+@app.route('/setupsetupspgtime', methods=['POST'])
+def setup_sampling_time():
+    sampling_time = request.form.get("samptime")
+    return render_template('home.html', 
+                            new_sampling=sampling_time,
+                            sensor_table={'data': [sensor.to_dict() for sensor in Sensor.query]})
+
 
 @app.route('/config', methods=["POST"])
 def configuration():
@@ -144,11 +153,13 @@ def configuration():
         z = request.form.get("motor_name")
         w = request.form.get("GPIO_pin")
         sensor_write_db(sensorNum=x, plantNa=y, motorNum=z, motorGPIOpin=w)
-        return render_template ('home.html', w = 'registrado', 
+        return render_template ('home.html', w = 'registrado',
+                                             new_sampling=sampling_time,
                                              sensor_table={'data': [sensor.to_dict() for sensor in Sensor.query]})
     except:
         message = 'Selecione un sensor!'
         return render_template ('error.html', message = message,
+                                              new_sampling=sampling_time,
                                               sensor_table={'data': [sensor.to_dict() for sensor in Sensor.query]})
 
 
@@ -156,21 +167,21 @@ def configuration():
 def activate_motor(motor_num):
     my_text ='Activating Motor {0}'.format(str(motor_num))
     print(my_text, motor_num)
-    manual_pump(motor_num, 1)
+    manual_pump(pump_pin=motor_num, delay=1)
     return my_text
 
 
 @app.route('/stop_motor/<int:motor_num>')
 def stop_motor(motor_num):
     my_text ='Stopping Motor {0} '.format(str(motor_num))
-    init_output(motor_num)
+    init_output(pin=motor_num)
     print(my_text, motor_num)
     return my_text
 
 
 @app.route ('/plot1.png')
 def plot1_png():
-    fig = create_figure(2)
+    fig = create_figure(sensorNum=2)
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
@@ -178,7 +189,7 @@ def plot1_png():
 
 @app.route ('/plot2.png')
 def plot2_png():
-    fig = create_figure(3)
+    fig = create_figure(sensorNum=3)
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
@@ -186,7 +197,7 @@ def plot2_png():
 
 @app.route ('/plot3.png')
 def plot3_png():
-    fig = create_figure(4)
+    fig = create_figure(sensorNum=4)
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
@@ -194,9 +205,14 @@ def plot3_png():
 
 @app.route ('/plot4.png')
 def plot4_png():
-    fig = create_figure(5)
+    fig = create_figure(sensorNum=5)
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
+
+
+@app.route('/samplingtime')
+def samplingtime():
+    return jsonify({'new_sampling':sampling_time})
 
 
