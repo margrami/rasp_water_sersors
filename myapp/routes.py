@@ -48,8 +48,9 @@ def messure_query(sensorNum:int):
     return 'SELECT value FROM Messures WHERE sensor_id={0} ORDER BY time'.format(sensorNum)
 
 
-def sensor_write_db_x(sensorNum:int, plantNa:str, motorNum:int, motorGPIOpin:int):
+def sensor_write_db(sensorNum:int, plantNa:str, motorNum:int, motorGPIOpin:int):
     # to be used the 1st time, otherwise the update doesn't work
+    print('creating sensor entry: ', sensorNum)
     lecture = Sensor(number=sensorNum, 
                      plantName=plantNa,
                      motor_number=motorNum,
@@ -58,7 +59,7 @@ def sensor_write_db_x(sensorNum:int, plantNa:str, motorNum:int, motorGPIOpin:int
     db.session.commit()
 
 
-def sensor_write_db(sensorNum:int, plantNa:str, motorNum:int, motorGPIOpin:int):
+def sensor_write_db_x(sensorNum:int, plantNa:str, motorNum:int, motorGPIOpin:int):
     # this is the procedure to update in sqlalchemy
     # use to upgrate the Sensor.plantName - to updating Don't forget the dict
     rows_changed = Sensor.query.filter_by(number=sensorNum).update(dict(plantName=str(plantNa), 
@@ -213,6 +214,8 @@ def plot4_png():
 
 @app.route('/samplingtime')
 def samplingtime():
-    return jsonify({'new_sampling':sampling_time})
+    dateraw = datetime.datetime.now()
+    lecture_hour = dateraw.strftime("%y-%m-%d_%H:%M:%S")
+    return render_template("sampling.html", a=lecture_hour)
 
 

@@ -59,9 +59,9 @@ for i in range(4500):
         # eval sensor_value to power pumps
         sensor_value = val(item['number'])
         print(item['number'], sensor_value, item['motor_GPIO_pin'])
-        if sensor_value > 2:
+        if sensor_value > 1.9:
             print(item['number'], sensor_value, 'activo motor en :', item['motor_GPIO_pin'])
-            manual_pump(pump_pin=item['motor_GPIO_pin'], delay=2)
+            manual_pump(pump_pin=item['motor_GPIO_pin'], delay=4)
     sleep(secondsinterval)
 
 #if __name__ == "__main__":
