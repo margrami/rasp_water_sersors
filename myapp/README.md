@@ -1,0 +1,1 @@
+Responsible Web application based on FLASK, jinja,  SQLite and javaScript. It permits to configure and read humidity sensors and activate servo pumps.  

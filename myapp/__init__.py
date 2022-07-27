@@ -15,7 +15,7 @@ activate_flag = False
 
 from myapp.models import Sensor # noqa
 
-# to verify 260722
+
 db.create_all()
 from myapp import routes #noqa
 
